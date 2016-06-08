@@ -39,7 +39,7 @@ var shouldExecute = function(flag, type) {
 
 var run = function(data, converter){
   data.forEach(function(dataSet) {
-    if(shouldExecute(flag, dataSet["type"])) {
+    if(shouldExecute(flag, dataSet["type"])  && converter ) {
       var automata = converter(dataSet);
       console.log(chalk.yellow(util.format("running %s example for %s", dataSet["name"], dataSet["type"])));
       console.log(chalk.yellow("Running for inputs:"));
