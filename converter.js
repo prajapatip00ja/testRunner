@@ -1,14 +1,26 @@
-// var dfaGenerator = require("../dfaGenerator.js").dfaGenerator;
-// var nfaGenerator = require("../nfaGenerator.js").nfaGenerator;
+// require your nfa/dfa generator libs here
+// ex:
+// var dfaGen=require('/path/to/dfaGen.js');
+// var dfaGen=require('/path/to/dfaGen.js');
 
-// exports.finiteAutometa = function(data){
-//     var mytuple = {};
-//       mytuple.states = data.tuple.states,
-//       mytuple.alphabets = data.tuple.alphabets,
-//       mytuple.initialState =data.tuple["start-state"],
-//       mytuple.finalStates =data.tuple["final-states"],
-//       mytuple.transtion = data.tuple.delta
-//     return (data.type == "dfa") ? dfaGenerator(mytuple) : nfaGenerator(mytuple);
-// }
 
-// this is a sample file that has to be supplied to the test runner
+/*
+
+Implement the following function to return
+a dfa or an nfa.
+The function accepts two variables, a type and a tuple.
+The type a string of value nfa or dfa.
+The tuple consists of:
+      tuple.states is an array of states.
+      tuple.alphabets is an array of alphabets.
+			tuple.delta is a transition function.
+      tuple.initialState is a single state.
+      tuple.finalStates is an array of states.
+
+You will have to do the work of converting this tuple into a format
+that your generator will accept as function arguments. Return either an nfa
+or a dfa based on the tuple.
+*/
+
+exports.finiteAutomata = function(type,tuple){
+}

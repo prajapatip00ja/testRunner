@@ -1,10 +1,6 @@
 var flag = process.argv[3];
 
-var link = "https://raw.githubusercontent.com/craftybones/examples_json/master/examples.json";
-var https = require("https");
-var request = https.request;
-
-var automataConverter = require("./"+process.argv[2]).finiteAutometa;
+var automataConverter = require("./"+process.argv[2]).finiteAutomata;
 var exampleData = require('./data.json');
 var util = require("util");
 var chalk = require("chalk");
@@ -28,19 +24,19 @@ var runTestCases = function(automata, dataSet) {
 }
 
 var shouldExecute = function(flag, type) {
-  var shouldExec;
-  if(!flag) {
-    shouldExec = true;
-  } else {
-      shouldExec = (flag == type);
+  var shouldExec=true;
+  if(flag) {
+    shouldExec=(flag==type);
   }
   return shouldExec;
 }
 
 var run = function(data, converter){
   data.forEach(function(dataSet) {
-    if(shouldExecute(flag, dataSet["type"])  && converter ) {
-      var automata = converter(dataSet);
+    var type=dataSet.type;
+    var tuple=dataSet.tuple;
+    if(shouldExecute(flag, type) && converter) {
+      var automata = converter(type,tuple);
       console.log(chalk.yellow(util.format("running %s example for %s", dataSet["name"], dataSet["type"])));
       console.log(chalk.yellow("Running for inputs:"));
       runTestCases(automata, dataSet);
