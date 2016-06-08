@@ -1,7 +1,7 @@
 // require your nfa/dfa generator libs here
 // ex:
 // var dfaGen=require('/path/to/dfaGen.js');
-// var dfaGen=require('/path/to/dfaGen.js');
+// var nfaGen=require('/path/to/nfaGen.js');
 
 
 /*
@@ -14,8 +14,8 @@ The tuple consists of:
       tuple.states is an array of states.
       tuple.alphabets is an array of alphabets.
 			tuple.delta is a transition function.
-      tuple.initialState is a single state.
-      tuple.finalStates is an array of states.
+      tuple["start-state"] is a single state.
+      tuple["final-states"] is an array of states.
 
 You will have to do the work of converting this tuple into a format
 that your generator will accept as function arguments. Return either an nfa
