@@ -1,3 +1,5 @@
+var _ = require("lodash");
+
 var automataConverter = require("./"+process.argv[2]).finiteAutomata;
 var exampleData = require('./data.json');
 var util = require("util");
@@ -8,6 +10,15 @@ var getFlag = function (arguments) {
         if ((arguments[count].toLowerCase() == "nfa") || (arguments[count].toLowerCase() == "dfa"))
             return arguments[count].toLowerCase();
     }
+};
+
+var getTestIndex = function (option, data) {
+    if(typeof(option) == "number") {
+        return --option;
+    }
+
+    return _.findIndex(data, ['name', option]);
+
 };
 
 var flag = getFlag(process.argv.slice(3));
@@ -27,7 +38,7 @@ var execOptions = {
     },
 
     "--only": function (data, converter, options) {
-        var testIndex = --options[1];
+        var testIndex = getTestIndex(options[1], data);
         return run(data, converter, testIndex);
     },
     
