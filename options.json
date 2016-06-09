@@ -1,0 +1,14 @@
+{
+  "--all-tests": {
+    "description": "This option will give you list of all test cases",
+    "example": "node testRunner.js converter.js --all-tests"
+  },
+  "--only": {
+    "description": "This option let you run only one test case at a time",
+    "example": "node testRunner.js converter.js --only [TEST_INDEX_NUMBER]"
+  },
+  "--help": {
+    "description": "Check all options",
+    "example": "node testRunner.js converter.js --help"
+  }
+}
