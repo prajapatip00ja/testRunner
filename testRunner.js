@@ -95,7 +95,7 @@ var run = function(data, converter, testIndex){
             return runTestCases(automata, dataSet);
         }
 
-        console.log(chalk.red(util.format("No '%s' test found here", flag)));
+        if(testIndex) console.log(chalk.red(util.format("No '%s' test found here", flag)));
     };
 
     return testIndex ? executeSingleTest(data[testIndex]) : data.forEach(executeSingleTest);
