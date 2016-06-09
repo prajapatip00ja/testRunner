@@ -21,3 +21,7 @@ node testRunner.js converter.js  // [runs all tests]
 node testRunner.js converter.js dfa // [runs dfa tests]
 
 node testRunner.js converter.js nfa // [runs nfa tests]
+
+
+###Utils:
+    node testRunner.js converter.js --help  // [See all option]
