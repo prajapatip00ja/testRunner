@@ -13,8 +13,8 @@ var getFlag = function (arguments) {
 };
 
 var getTestIndex = function (option, data) {
-    if(typeof(option) == "number") {
-        return --option;
+    if(parseInt(option)) {
+        return parseInt(option) - 1;
     }
 
     return _.findIndex(data, ['name', option]);
@@ -99,6 +99,7 @@ var run = function(data, converter, testIndex, status){
 
         if(testIndex) console.log(chalk.red(util.format("No '%s' test found here", flag)));
     };
+
 
     return testIndex ? executeSingleTest(data[testIndex]) : data.forEach(executeSingleTest);
 };
