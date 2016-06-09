@@ -41,7 +41,9 @@ var execOptions = {
         var testIndex = getTestIndex(options[1], data);
         return run(data, converter, testIndex);
     },
-    
+    "--fail": function (data, converter, options) {
+        return run(data, converter, undefined, "fail");
+    },
     "--help": function () {
         var options = require("./options.json");
         Object.keys(options).forEach(function (option) {
@@ -58,9 +60,9 @@ var optionHandler = function (data, options, converter) {
     return execOptions[option](data, converter, options);
 };
 
-var runTestCases = function(automata, dataSet) {
+var runTestCases = function(automata, dataSet, status) {
   dataSet["pass-cases"].forEach(function(pass_case){
-    if(automata(pass_case)) {
+    if(status != "fail" && automata(pass_case)) {
       console.log(chalk.green(util.format("%s : pass", pass_case)));
     } else {
       console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
@@ -71,7 +73,7 @@ var runTestCases = function(automata, dataSet) {
     if(automata(pass_case)) {
       console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
     } else {
-      console.log(chalk.green(util.format("%s : pass", pass_case)));
+      if(status != "fail") console.log(chalk.green(util.format("%s : pass", pass_case)));
     }
   });
 };
@@ -84,7 +86,7 @@ var shouldExecute = function(flag, type) {
   return shouldExec;
 };
 
-var run = function(data, converter, testIndex){
+var run = function(data, converter, testIndex, status){
     executeSingleTest = function(dataSet) {
         var type=dataSet.type;
         var tuple=dataSet.tuple;
@@ -92,7 +94,7 @@ var run = function(data, converter, testIndex){
             var automata = converter(type,tuple);
             console.log(chalk.yellow(util.format("running %s example for %s", dataSet["name"], dataSet["type"])));
             console.log(chalk.yellow("Running for inputs:"));
-            return runTestCases(automata, dataSet);
+            return runTestCases(automata, dataSet, status);
         }
 
         if(testIndex) console.log(chalk.red(util.format("No '%s' test found here", flag)));

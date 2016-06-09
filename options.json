@@ -11,6 +11,10 @@
     "description": "This option let you run only one test case at a time",
     "example": "node testRunner.js converter.js --only [TEST_INDEX_NUMBER or TEST_NAME].\n\tnode testRunner.js converter.js --only 1\n\tnode testRunner.js converter.js --only 'This is my test case' \n\tnode testRunner.js converter.js [nfa | dfa] --only 'This is my test case'"
   },
+  "--fail": {
+    "description": "This option let you run only failed test cases",
+    "example": "node testRunner.js converter.js [state-machine] --fail\n\n\tnode testRunner.js converter.js --fail\n\tnode testRunner.js converter.js [nfa | dfa] --fail"
+  },
   "--help": {
     "description": "Check all options",
     "example": "node testRunner.js converter.js --help"
