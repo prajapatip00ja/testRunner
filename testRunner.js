@@ -39,10 +39,10 @@ var execOptions = {
 
     "--only": function (data, converter, options) {
         var testIndex = getTestIndex(options[1], data);
-        return run(data, converter, testIndex);
+        return run(data, converter, testIndex, showAllForPassCaseCallback, showAllForFailCaseCallback);
     },
     "--fail": function (data, converter, options) {
-        return run(data, converter, undefined, "fail");
+        return run(data, converter, showOnlyPassCaseCallback, showOnlyFailCaseCallback, undefined);
     },
     "--help": function () {
         var options = require("./options.json");
@@ -60,22 +60,57 @@ var optionHandler = function (data, options, converter) {
     return execOptions[option](data, converter, options);
 };
 
-var runTestCases = function(automata, dataSet, status) {
-  dataSet["pass-cases"].forEach(function(pass_case){
-    if(status != "fail" && automata(pass_case)) {
-      console.log(chalk.green(util.format("%s : pass", pass_case)));
-    } else {
-      console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
-    }
-  });
+// Callbacks Start
 
-  dataSet["fail-cases"].forEach(function(pass_case){
-    if(automata(pass_case)) {
-      console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
-    } else {
-      if(status != "fail") console.log(chalk.green(util.format("%s : pass", pass_case)));
-    }
-  });
+var showAllForPassCaseCallback = function(dataSet, automata){
+    var passCaseCallback = function (pass_case) {
+        if(automata(pass_case)) {
+            console.log(chalk.green(util.format("%s : pass", pass_case)));
+        } else {
+            console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
+        }
+    };
+    dataSet["pass-cases"].forEach(passCaseCallback)
+
+};
+
+var showAllForFailCaseCallback = function(dataSet, automata){
+    var failCaseCallback = function (pass_case) {
+        if(automata(pass_case)) {
+            console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
+        } else {
+            console.log(chalk.green(util.format("%s : pass", pass_case)));
+        }
+    };
+
+    dataSet["fail-cases"].forEach(failCaseCallback)
+};
+
+var showOnlyPassCaseCallback = function (dataSet, automata) {
+    var passCaseCallback = function (pass_case) {
+        if(!automata(pass_case)) {
+            console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
+        }
+    };
+
+    dataSet["pass-cases"].forEach(passCaseCallback)
+};
+
+var showOnlyFailCaseCallback = function (dataSet, automata) {
+    var passCaseCallback = function (pass_case) {
+        if(automata(pass_case)) {
+            console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
+        }
+    };
+
+    dataSet["fail-cases"].forEach(passCaseCallback)
+};
+
+// Callbacks End
+
+var runTestCases = function(automata, dataSet, passCaseCallback, failCaseCallback) {
+  passCaseCallback(dataSet, automata);
+  failCaseCallback(dataSet, automata);
 };
 
 var shouldExecute = function(flag, type) {
@@ -86,7 +121,7 @@ var shouldExecute = function(flag, type) {
   return shouldExec;
 };
 
-var run = function(data, converter, testIndex, status){
+var run = function(data, converter, passCaseCallback, failCaseCallback, testIndex){
     executeSingleTest = function(dataSet) {
         var type=dataSet.type;
         var tuple=dataSet.tuple;
@@ -94,12 +129,11 @@ var run = function(data, converter, testIndex, status){
             var automata = converter(type,tuple);
             console.log(chalk.yellow(util.format("running %s example for %s", dataSet["name"], dataSet["type"])));
             console.log(chalk.yellow("Running for inputs:"));
-            return runTestCases(automata, dataSet, status);
+            return runTestCases(automata, dataSet, passCaseCallback, failCaseCallback);
         }
 
         if(testIndex) console.log(chalk.red(util.format("No '%s' test found here", flag)));
     };
-
 
     return testIndex ? executeSingleTest(data[testIndex]) : data.forEach(executeSingleTest);
 };
@@ -126,5 +160,5 @@ var optionSet = getOptionSet(process.argv.slice(3));
 if(hasOption(optionSet)) {
     optionHandler(JSON.parse(exampleData), optionSet, automataConverter)
 } else {
-  run(JSON.parse(exampleData), automataConverter);
+  run(JSON.parse(exampleData), automataConverter, showAllForPassCaseCallback, showAllForFailCaseCallback);
 }
