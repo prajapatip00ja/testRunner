@@ -5,7 +5,7 @@
   },
   "--list": {
     "description": "This option will give you list of all test cases",
-    "example": "node testRunner.js converter.js --all-tests"
+    "example": "node testRunner.js converter.js --list"
   },
   "--only": {
     "description": "This option let you run only one test case at a time",
