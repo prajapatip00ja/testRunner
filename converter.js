@@ -21,6 +21,11 @@ You will have to do the work of converting this tuple into a format
 that your generator will accept as function arguments. Return either an nfa
 or a dfa based on the tuple.
 */
+var DFAGenerator = require("../finite-automata/build/src/dfa_generator");
+var NFAGenerator = require("../finite-automata/build/src/nfa_generator");
 
 exports.finiteAutomata = function(type,tuple){
-}
+    return (type == "dfa") ?
+        new DFAGenerator(tuple.states, tuple.alphabets, tuple.delta, tuple["start-state"], tuple["final-states"]).getAutomata() :
+        new NFAGenerator(tuple.states, tuple.alphabets, tuple.delta, tuple["start-state"], tuple["final-states"]).getAutomata();
+};

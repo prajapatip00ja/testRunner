@@ -24,7 +24,7 @@ var getTestIndex = function (option, data) {
 var flag = getFlag(process.argv.slice(3));
 
 var execOptions = {
-    "--all-tests": function (data) {
+    "--list": function (data) {
         data.forEach(function (dataSet, index) {
             if(flag && !shouldExecute(flag, dataSet.type)) {
                 return;
@@ -39,10 +39,10 @@ var execOptions = {
 
     "--only": function (data, converter, options) {
         var testIndex = getTestIndex(options[1], data);
-        return run(data, converter, testIndex);
+        return run(data, converter, showAllForPassCaseCallback, showAllForFailCaseCallback, testIndex);
     },
     "--fail": function (data, converter, options) {
-        return run(data, converter, undefined, "fail");
+        return run(data, converter, showOnlyPassCaseCallback, showOnlyFailCaseCallback, undefined);
     },
     "--help": function () {
         var options = require("./options.json");
@@ -57,25 +57,69 @@ var execOptions = {
 
 var optionHandler = function (data, options, converter) {
     var option = options[0];
+    if(!execOptions[option]) return console.log("Invalid option. Please check on `node testRunner.js converter.js --help`");
     return execOptions[option](data, converter, options);
 };
 
-var runTestCases = function(automata, dataSet, status) {
-  dataSet["pass-cases"].forEach(function(pass_case){
-    if(status != "fail" && automata(pass_case)) {
-      console.log(chalk.green(util.format("%s : pass", pass_case)));
-    } else {
-      console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
-    }
-  });
+// Callbacks Start
 
-  dataSet["fail-cases"].forEach(function(pass_case){
-    if(automata(pass_case)) {
-      console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
-    } else {
-      if(status != "fail") console.log(chalk.green(util.format("%s : pass", pass_case)));
-    }
-  });
+var showAllForPassCaseCallback = function(dataSet, automata){
+    var passCaseCallback = function (pass_case) {
+        if(automata(pass_case)) {
+            console.log(chalk.green(util.format("%s : pass", pass_case)));
+        } else {
+            console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
+        }
+    };
+
+    var failedTests = dataSet["pass-cases"].filter(passCaseCallback);
+    return failedTests.length == 0;
+};
+
+var showAllForFailCaseCallback = function(dataSet, automata){
+    var failCaseCallback = function (pass_case) {
+        if(automata(pass_case)) {
+            console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
+            return true;
+        } else {
+            console.log(chalk.green(util.format("%s : pass", pass_case)));
+        }
+    };
+
+    var failedTests = dataSet["fail-cases"].filter(failCaseCallback);
+
+    return failedTests.length == 0;
+};
+
+var showOnlyPassCaseCallback = function (dataSet, automata) {
+    var passCaseCallback = function (pass_case) {
+        if(!automata(pass_case)) {
+            console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
+            return true;
+        }
+    };
+
+    return dataSet["pass-cases"].filter(passCaseCallback).length == 0;
+};
+
+var showOnlyFailCaseCallback = function (dataSet, automata) {
+    var passCaseCallback = function (pass_case) {
+        if(automata(pass_case)) {
+            console.log(chalk.bold.red(util.format("%s : fail", pass_case)));
+        }
+    };
+
+    dataSet["fail-cases"].forEach(passCaseCallback)
+};
+
+// Callbacks End
+
+var runTestCases = function(automata, dataSet, passCaseCallback, failCaseCallback) {
+    var isFailed = false;
+    if(!passCaseCallback(dataSet, automata)) isFailed = true;
+    if(!failCaseCallback(dataSet, automata)) isFailed = true;
+
+    return isFailed;
 };
 
 var shouldExecute = function(flag, type) {
@@ -86,7 +130,9 @@ var shouldExecute = function(flag, type) {
   return shouldExec;
 };
 
-var run = function(data, converter, testIndex, status){
+var run = function(data, converter, passCaseCallback, failCaseCallback, testIndex){
+    var result = { "passed": 0, "fail": 0 };
+
     executeSingleTest = function(dataSet) {
         var type=dataSet.type;
         var tuple=dataSet.tuple;
@@ -94,14 +140,20 @@ var run = function(data, converter, testIndex, status){
             var automata = converter(type,tuple);
             console.log(chalk.yellow(util.format("running %s example for %s", dataSet["name"], dataSet["type"])));
             console.log(chalk.yellow("Running for inputs:"));
-            return runTestCases(automata, dataSet, status);
+            var isFailed = runTestCases(automata, dataSet, passCaseCallback, failCaseCallback);
+            if(isFailed) {
+                result.fail++;
+            } else {
+                result.passed++;
+            }
         }
-
-        if(testIndex) console.log(chalk.red(util.format("No '%s' test found here", flag)));
     };
 
-
-    return testIndex ? executeSingleTest(data[testIndex]) : data.forEach(executeSingleTest);
+    testIndex ? executeSingleTest(data[testIndex]) : data.forEach(executeSingleTest);
+    console.log("\n\n" +
+        chalk.green("Passed: " + result.passed) + " " +
+        chalk.red("Failed: " + result.fail) + " " +
+        chalk.yellow("out of " + (result.fail + result.passed)))
 };
 
 var getOptionSet = function (arguments) {
@@ -126,5 +178,5 @@ var optionSet = getOptionSet(process.argv.slice(3));
 if(hasOption(optionSet)) {
     optionHandler(JSON.parse(exampleData), optionSet, automataConverter)
 } else {
-  run(JSON.parse(exampleData), automataConverter);
+  run(JSON.parse(exampleData), automataConverter, showAllForPassCaseCallback, showAllForFailCaseCallback);
 }

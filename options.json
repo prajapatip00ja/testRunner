@@ -3,9 +3,9 @@
     "description": "This is a util to run your DFA and NFA tests.",
     "example": "node testRunner.js converter.js [state-machine] [option]\n\n\tstate-machine:\t\tnfa or dfa\n\toption:\t\t\tmention one of the option you want to execute\n\nNote: 'state-machine' and 'option' are optional arguments for testRunner"
   },
-  "--all-tests": {
+  "--list": {
     "description": "This option will give you list of all test cases",
-    "example": "node testRunner.js converter.js --all-tests"
+    "example": "node testRunner.js converter.js --list"
   },
   "--only": {
     "description": "This option let you run only one test case at a time",
