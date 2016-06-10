@@ -24,7 +24,7 @@ var getTestIndex = function (option, data) {
 var flag = getFlag(process.argv.slice(3));
 
 var execOptions = {
-    "--all-tests": function (data) {
+    "--list": function (data) {
         data.forEach(function (dataSet, index) {
             if(flag && !shouldExecute(flag, dataSet.type)) {
                 return;
@@ -57,6 +57,7 @@ var execOptions = {
 
 var optionHandler = function (data, options, converter) {
     var option = options[0];
+    if(!execOptions[option]) return console.log("Invalid option. Please check on `node testRunner.js converter.js --help`");
     return execOptions[option](data, converter, options);
 };
 
